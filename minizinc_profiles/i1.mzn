@@ -8,7 +8,7 @@ var int: tf;
 var int: ba;
 var int: ta;
 
-constraint h = 13; % nicht zu groß machen, sonst zu viele Lösungen
+constraint h = 17; % nicht zu groß machen, sonst zu viele Lösungen
 constraint tw > 0;
 constraint bf > tw;
 constraint tf > 0;
