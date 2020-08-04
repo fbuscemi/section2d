@@ -8,8 +8,16 @@ import cv2
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 
+# TODO: make a PIL version, too -> direct use for torchvision
+
 def image_cv2(outers, inners, figsize=300, pad=20):
-    """Return np.array. background is white (1), shape black (0)"""
+    """Return np.array, uint8 (0-255). background is white (255), shape black (0).
+    To convert this into a PIL image for torchvision:
+
+    `from PIL import Image`
+    `arr = image_cv2(outers, inners)`
+    `img = Image.from_array(arr)`
+    """
 
     mins = np.min(np.concatenate(outers), axis=0)
     maxs = np.max(np.concatenate(outers), axis=0)
@@ -42,10 +50,10 @@ def image_mpl(outers, inners, ax=None):
         fig, ax = plt.subplots(figsize=(1,1))
         
     for outer in outers:
-        mppoly = matplotlib.patches.Polygon(outer, facecolor='k', linewidth=0)
+        mppoly = plt.Polygon(outer, facecolor='k', linewidth=0)
         ax.add_patch(mppoly)
     for inner in inners:
-        mppoly = matplotlib.patches.Polygon(inner, facecolor='w', linewidth=0)
+        mppoly = plt.Polygon(inner, facecolor='w', linewidth=0)
         ax.add_patch(mppoly)
 
     ax.autoscale(tight=True)

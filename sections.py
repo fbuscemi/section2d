@@ -214,11 +214,13 @@ def verts_z6(h, tw, ba, ta, rf):
     - Metal_Stg_Z_04_b
     """
     arrays = [
-        arc(rf, h-rf, rf-tw, 180, 0),
-        arc(rf, h-rf, rf, 0, 180),
+        # use more points than usual on large round flange
+        arc(rf, h-rf, rf-tw, 180, 0, n=40),
+        arc(rf, h-rf, rf, 0, 180, n=40),
         [(0, ta), (tw-ba, ta), (tw-ba, 0), (0, 0)]
     ]
     return [np.concatenate(arrays)], []
+
 
 def verts_z8(h, tw, ba, ta, ra, rf):
     """Z section, round flange, fillets.
@@ -227,10 +229,27 @@ def verts_z8(h, tw, ba, ta, ra, rf):
     - Metal_Stg_Z_04_a
     """
     arrays = [
-        arc(rf, h-rf, rf-tw, 180, 0),
-        arc(rf, h-rf, rf, 0, 180),
+        # use more points than usual on large round flange
+        arc(rf, h-rf, rf-tw, 180, 0, n=40),
+        arc(rf, h-rf, rf, 0, 180, n=40),
         arc(-ra, ta+ra, ra, 360, 270),
         [(tw-ba, 0), (0, 0)]
+    ]
+    return [np.concatenate(arrays)], []
+
+
+def verts_z9(h, tw, ba, ta, ra, bf, tf, rf, blf, tlf, rlf):
+    """Z section, with one lipped flange, machined, with fillets.
+
+    Corresponds to:
+    - Metal_Stg_Z_02_a
+    """
+    arrays = [
+        arc(rf+tw, h-tf-rf, rf, 180, 90),
+        arc(bf-tlf-rlf, h-tf-rlf, rlf, 90, 0),
+        [(bf-tlf, h-blf), (bf, h-blf), (bf, h), (0, h)],
+        arc(-ra, ra+ta, ra, 0, -90),
+        [(tw-ba, ta), (tw-ba, 0), (ba, 0)]
     ]
     return [np.concatenate(arrays)], []
 
@@ -314,6 +333,7 @@ def verts_t1(h, tw, ba, ta):
         ((tw-ba)/2, 0),
     ])
     return [vertices], []
+
 
 def verts_t2(h, tw, ba, ta, ra):
     """T section, with fillets.
@@ -401,6 +421,7 @@ VERTEX_FUNCTIONS = {
     "z5":     (verts_z5, ["h", "tw", "ba", "ta", "ra", "bf", "tf", "rf"]),
     "z6":     (verts_z6, ["h", "tw", "ba", "ta", "rf"]),
     "z8":     (verts_z8, ["h", "tw", "ba", "ta", "ra", "rf"]),
+    "z9":     (verts_z9, ["h", "tw", "ba", "ta", "ra", "bf", "tf", "rf", "blf", "tlf", "rlf"]),
 }
 
 
