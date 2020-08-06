@@ -201,8 +201,8 @@ def verts_z5(h, tw, ba, ta, ra, bf, tf, rf):
     arrays = [
         arc(rf+tw, h-tf-rf, rf, 180, 90),
         [(bf, h-tf), (bf, h), (0, h)],
-        arc(-ra, ta+ra, 360, 270),
-        [(tw-ba, ta), (tw-ba, 0)]
+        arc(-ra, ta+ra, ra, 360, 270),
+        [(tw-ba, ta), (tw-ba, 0), (tw, 0)]
     ]
     return [np.concatenate(arrays)], []
 
@@ -230,10 +230,10 @@ def verts_z8(h, tw, ba, ta, ra, rf):
     """
     arrays = [
         # use more points than usual on large round flange
-        arc(rf, h-rf, rf-tw, 180, 0, n=40),
-        arc(rf, h-rf, rf, 0, 180, n=40),
+        arc(rf, h-rf, rf-tw, 180, 0, n=80),
+        arc(rf, h-rf, rf, 0, 180, n=80),
         arc(-ra, ta+ra, ra, 360, 270),
-        [(tw-ba, 0), (0, 0)]
+        [(tw-ba, ta), (tw-ba, 0), (tw, 0)]
     ]
     return [np.concatenate(arrays)], []
 
@@ -249,7 +249,7 @@ def verts_z9(h, tw, ba, ta, ra, bf, tf, rf, blf, tlf, rlf):
         arc(bf-tlf-rlf, h-tf-rlf, rlf, 90, 0),
         [(bf-tlf, h-blf), (bf, h-blf), (bf, h), (0, h)],
         arc(-ra, ra+ta, ra, 0, -90),
-        [(tw-ba, ta), (tw-ba, 0), (ba, 0)]
+        [(tw-ba, ta), (tw-ba, 0), (tw, 0)]
     ]
     return [np.concatenate(arrays)], []
 

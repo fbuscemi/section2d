@@ -8,23 +8,23 @@ var int: rf;
 var int: ba;
 var int: ra;
 
-constraint h = 23; % nicht zu groß machen, sonst zu viele Lösungen
-constraint tw > 0;
-constraint bf > tw + rf;
-constraint ba > tw + ra;
-constraint rf > tw;
-constraint ra > tw;
-constraint rf < 5*tw;
-constraint ra < 5*tw;
+constraint h <= 80; % nicht zu groß machen, sonst zu viele Lösungen
+constraint h mod 10 = 0; 
+constraint h >= 4*tw;
+constraint tw = 1;
 
-constraint 5*tw <= h;
-constraint 100*tw >= h; 
+constraint ba mod 4 = 0;
+constraint ba >= tw + ra;
+constraint ra >= tw;
+constraint ra <= 8*tw;
+constraint 3*ba <= 2*h;
+constraint ba <= bf;  % eindeutig bleiben...
 
-constraint ba < h;
-constraint bf < h;
-
-constraint ra + rf + 2*tw < 0.8*h;
-constraint ba >= bf; % to avoid ambuguities in classification and finding the parameters
+constraint bf mod 4 = 0;
+constraint bf >= tw + rf;
+constraint rf >= tw;
+constraint rf <= 8*tw;
+constraint 3*bf <= 2*h;
 
 solve satisfy;
 

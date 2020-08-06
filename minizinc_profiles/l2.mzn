@@ -1,4 +1,4 @@
-% C2 - sheet metal c section
+% L2 - sheet metal L section
 include "globals.mzn";
 
 var int: h;
@@ -6,18 +6,15 @@ var int: tw;
 var int: ba;
 var int: ra;
 
-constraint h = 100; % nicht zu groß machen, sonst zu viele Lösungen
-constraint tw > 0;
-constraint ba > tw + ra;
-constraint ra > tw;
-constraint ra < 5*tw;
+constraint h <= 80; % nicht zu groß machen, sonst zu viele Lösungen
+constraint h mod 4 = 0; 
+constraint h >= 5*tw;
+constraint tw = 1;
 
-constraint 5*tw <= h;
-constraint 100*tw >= h; 
-
-constraint ba < h;
-
-constraint ra + 2*tw < 0.8*h;
+constraint ba >= tw + ra;
+constraint ra >= tw;
+constraint ra <= 8*tw;
+constraint ba <= h;
 
 solve satisfy;
 
