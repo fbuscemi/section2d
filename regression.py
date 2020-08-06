@@ -3,11 +3,50 @@ import copy
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision import transforms 
 from cnn_util import conv_dims, pool_dims
+
+## Define Transforms as functions
+
+def full_transform(image_size):
+    transform = transforms.Compose([
+        # these operate on PIL image
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        # the fill thing needs to be 255 (white); we're still in uint8 mode
+        transforms.RandomRotation((0,90), expand=True, fill=255),
+        transforms.Resize((image_size, image_size), interpolation=0),
+        # Normalise wants a tensor as input, so ToTensor has to run first
+        transforms.ToTensor(), 
+        transforms.Normalize(0, 1), 
+    ])
+    return transform
+
+def flip_transform(image_size):
+    transform = transforms.Compose([
+        # these operate on PIL image
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        transforms.Resize((image_size, image_size), interpolation=0),
+        # Normalise wants a tensor as input, so ToTensor has to run first
+        transforms.ToTensor(), 
+        transforms.Normalize(0, 1), 
+    ])
+    return transform
+
+def no_transform(image_size):
+    transform = transforms.Compose([
+        transforms.Resize((image_size, image_size), interpolation=0),
+        # Normalise wants a tensor as input, so ToTensor has to run first
+        transforms.ToTensor(), 
+        transforms.Normalize(0, 1), 
+    ])
+    return transform
+
 
 class Net1(nn.Module):
     
-    def __init__(self, output_size, image_size=100, param_names=[], description=""):
+    def __init__(self, output_size, image_size, param_names=[], description=""):
         super(Net1, self).__init__()
         
         self.image_size = image_size
@@ -33,7 +72,7 @@ class Net1(nn.Module):
         # fully connected layers
         self.mh0 = n2 * op2**2            # needed later - size of first linear layer
         mh1 = 1000                        # input size of second fully connected layer        
-        mh2 = 50                          # input size of second fully connected layer        
+        mh2 = 100                          # input size of second fully connected layer        
         
         self.conv1 = nn.Conv2d(m1, n1, k1, stride=s1, padding=p1)
         self.conv2 = nn.Conv2d(m2, n2, k2, stride=s2, padding=p2)
@@ -78,8 +117,8 @@ class Net1(nn.Module):
         print("parameter names: %s" % ", ".join(checkpoint['param_names']))
 
         model = Net1(checkpoint['output_size'], 
-                     image_size=checkpoint['image_size'], 
-                     description=checkpoint['image_size'], 
+                     checkpoint['image_size'], 
+                     description=checkpoint['description'], 
                      param_names=checkpoint['param_names'],
                     )
         model.load_state_dict(checkpoint['state_dict'])
@@ -117,8 +156,6 @@ def train_regression(model, dataloaders, criterion, optimizer, scheduler=None, n
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}: '.format(epoch + 1, num_epochs), end="")
-        #print('-' * 10)
-
         # Each epoch has a training and validation phase
         for phase in ['train', 'val']:
             if phase == 'train':
@@ -183,3 +220,10 @@ def train_regression(model, dataloaders, criterion, optimizer, scheduler=None, n
     model.load_state_dict(best_model_wts)
 
     return history
+
+
+
+class Predictor(object):
+
+    def __init__(self, model, ):
+        pass
