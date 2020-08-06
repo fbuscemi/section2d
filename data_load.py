@@ -11,26 +11,22 @@ from PIL import Image
 class ShapeDimensionDataset(Dataset):
     """Datset for 2D shape dimensions."""
 
-    # TODO: make this a parameter, then we can re-use this class for other types
-    target_cols = ['h_scaled', 'tw_scaled', 'ba_scaled', 'ra_scaled']
-    
+
     # TODO: add a method that returns un-scaled dimensions ...
     
     def __init__(self, csv_file, root_dir, transform=None, target_cols=None):
         """
         Args:
-            csv_file (string): Path to the csv file with scaled dimensions.
-            root_dir (string): Directory with all the images.
-            transform (callable, optional): Optional transform to be applied
-                on a sample.
+            - csv_file (string): Path to the csv file with scaled dimensions.
+            - root_dir (string): Directory with all the images.
+            - transform (callable, optional): Optional transform to be applied
+              on a sample.
+            - target_cols: list of strings, column names of scaled targets in pandas
         """
         self.shape_data = pd.read_csv(csv_file)
         self.root_dir = root_dir
         self.transform = transform
-
-        # FIXME: L2 uses the class values, C2 uses the parameters
-        if target_cols is not None:
-            self.target_cols = target_cols
+        self.target_cols = target_cols
 
 
     def __len__(self):

@@ -97,3 +97,13 @@ def integrate02(vertices):
         total += (x[i-1]*y[i] - x[i]*y[i-1]) * (y[i-1]**2 + y[i-1]*y[i] + y[i]**2)
     return total/12.0
 
+
+def polygon_area(outers, inners):
+    total_area = 0. 
+    for contour in outers:
+        area = integrate00(contour)
+        total_area += abs(area)
+    for contour in inners:
+        area = integrate00(contour)
+        total_area -= abs(area)        
+    return total_area
