@@ -1,0 +1,7 @@
+minizinc_profiles/*.csv
+minizinc_profiles/*.txt
+
+dataset/*
+.ipynb_checkpoints/*
+__pycache__/*
+models/*
