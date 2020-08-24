@@ -1,6 +1,8 @@
 import numpy as np
 import shapely
 from shapely.geometry import Polygon
+from poly import integrate00
+from utils import image_cv2, image_mpl
 
 # baue einen bogen...
 def arc(xc, yc, r, start, end, n=10, include_last=True):
@@ -438,3 +440,111 @@ def section(kind, *args):
         p = p.difference(Polygon(verts))
     #assert p.is_valid
     return p if p.is_valid else None
+
+
+def rotate_section(outer, inners, alpha, refpoint=(0,0)):
+    pass
+
+
+
+class Section(object):
+
+    def __init__(self, *args):
+        """we should be able to initialise this in different ways:
+        - list of parameters (order as in parameter names)
+        - keyword arguments
+        - dictionary
+        """
+        #print(self.shape_type)
+        #print(self.parameter_names)
+        self.params = args
+        #print(args)
+
+
+        vertex_function = VERTEX_FUNCTIONS[self.shape_type][0]
+        self.outers, self.inners = vertex_function(*self.params)
+
+
+    def params(self):
+        """Return list of parameters"""
+        
+
+    def params_dict(self):
+        """Return dictionary of parameters"""
+        pass    
+    
+    def to_shapely(self):
+        """Return as shapely Polygon"""
+        p = Polygon(self.outers[0])
+        for verts in self.outers[1:]:
+            p = p.union(Polygon(verts))
+        for verts in self.inners:
+            p = p.difference(Polygon(verts))
+        return p if p.is_valid else None
+
+    def to_mesh(self):
+        return NotImplemented
+
+    def to_figure(self, ax=None):
+        """Return matplotlib.Figure"""
+        return image_mpl(self.outers, self.inners, ax=ax)
+
+    def to_PIL(self):
+        """Return PIL.Image"""
+        return NotImplemented
+
+    def to_image(self, figsize=300, pad=10):
+        """Return image as np.adarray (opencv etc."""
+        return image_cv2(self.outers, self.inners, figsize=figsize, pad=pad)
+
+    def area(self):
+        area_ = 0
+        for vertices in self.outers:
+            area_ += abs(integrate00(vertices))
+        for vertices in self.inners:
+            area_ -= abs(integrate00(vertices))
+        return area_
+
+    def centroid(self):
+        return NotImplemented
+
+    def principal_axes(self):
+        return NotImplemented
+
+    def inertia_tensor(self, refpoint="centroid", axes="uv"):
+        return NotImplemented
+
+
+
+
+class SectionRect(Section):
+    shape_type = "rect"
+    parameter_names = VERTEX_FUNCTIONS["rect"][1]
+    
+class SectionC1(Section):
+    shape_type = "c1"
+    parameter_names = VERTEX_FUNCTIONS["c1"][1]
+
+class SectionC2(Section):
+    shape_type = "c2"
+    parameter_names = VERTEX_FUNCTIONS["c2"][1]    
+
+class SectionC3(Section):
+    shape_type = "c3"
+    parameter_names = VERTEX_FUNCTIONS["c3"][1]    
+
+class SectionE1(Section):
+    shape_type = "e1"
+    parameter_names = VERTEX_FUNCTIONS["e1"][1]    
+
+class SectionI1(Section):
+    shape_type = "i1"
+    parameter_names = VERTEX_FUNCTIONS["i1"][1]    
+
+class SectionJ1(Section):
+    shape_type = "j1"
+    parameter_names = VERTEX_FUNCTIONS["j1"][1]    
+
+class SectionJ2(Section):
+    shape_type = "j2"
+    parameter_names = VERTEX_FUNCTIONS["j2"][1]    
