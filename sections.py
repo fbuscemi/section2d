@@ -548,3 +548,16 @@ class SectionJ1(Section):
 class SectionJ2(Section):
     shape_type = "j2"
     parameter_names = VERTEX_FUNCTIONS["j2"][1]    
+
+class SectionL1(Section):
+    shape_type = "l1"
+    parameter_names = VERTEX_FUNCTIONS["l1"][1]        
+
+class SectionL2(Section):
+    shape_type = "l2"
+    parameter_names = VERTEX_FUNCTIONS["l2"][1]        
+
+
+class SectionZ3(Section):
+    shape_type = "z3"
+    parameter_names = VERTEX_FUNCTIONS["z3"][1]    
