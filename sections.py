@@ -457,8 +457,12 @@ class Section(object):
         """
         #print(self.shape_type)
         #print(self.parameter_names)
-        self.params = args
-        #print(args)
+        self.params = args # list of parameters, same order as 
+        for k, v in zip(self.parameter_names, self.params):
+            setattr(self, k, v)
+
+        if not self.is_valid():
+            raise ValueError("invalid parameters for this section type")
 
 
         vertex_function = VERTEX_FUNCTIONS[self.shape_type][0]
@@ -467,11 +471,11 @@ class Section(object):
 
     def params(self):
         """Return list of parameters"""
-        
+        return self.params
 
     def params_dict(self):
         """Return dictionary of parameters"""
-        pass    
+        return {k: getattr(self, k) for k in self.parameter_names}
     
     def to_shapely(self):
         """Return as shapely Polygon"""
@@ -514,20 +518,52 @@ class Section(object):
     def inertia_tensor(self, refpoint="centroid", axes="uv"):
         return NotImplemented
 
+    def is_valid(self):
+        """Return True if section is geometrically valid (i.e. can be constructed).
+        This does not mean that it is a typical section."""
+        return NotImplemented
+
 
 
 
 class SectionRect(Section):
     shape_type = "rect"
-    parameter_names = VERTEX_FUNCTIONS["rect"][1]
+    parameter_names = ["h", "b"]   # VERTEX_FUNCTIONS["rect"][1]
+
+    def is_valid(self):
+        return all([
+            self.h > 0,
+            self.b > 0
+        ])
     
+
 class SectionC1(Section):
     shape_type = "c1"
-    parameter_names = VERTEX_FUNCTIONS["c1"][1]
+    parameter_names = ["h", "tw", "ba", "ta", "bf", "tf"]  # VERTEX_FUNCTIONS["c1"][1]
+
+    def is_valid(self):
+        return all([
+            self.h > self.tf + self.ta,
+            self.tw > 0,
+            self.ba > self.tw,
+            self.ta > 0,
+            self.bf > self.tw,
+            self.tf > 0,
+        ])
 
 class SectionC2(Section):
     shape_type = "c2"
-    parameter_names = VERTEX_FUNCTIONS["c2"][1]    
+    parameter_names = ["h", "tw", "ba", "ra", "bf", "rf"]  # VERTEX_FUNCTIONS["c2"][1]    
+
+    def is_valid(self):
+        return all([
+            self.h > 2*self.tw + self.ra + self.rf,
+            self.tw > 0,
+            self.ba > self.tw + self.ra,
+            self.ra > 0,
+            self.bf > self.tw + self.rf,
+            self.rf > 0,
+        ])    
 
 class SectionC3(Section):
     shape_type = "c3"
@@ -539,7 +575,17 @@ class SectionE1(Section):
 
 class SectionI1(Section):
     shape_type = "i1"
-    parameter_names = VERTEX_FUNCTIONS["i1"][1]    
+    parameter_names = ["h", "tw", "ba", "ta", "bf", "tf"]  # VERTEX_FUNCTIONS["i1"][1]    
+
+    def is_valid(self):
+        return all([
+            self.h > self.tf + self.ta,
+            self.tw > 0,
+            self.ba > self.tw,
+            self.ta > 0,
+            self.bf > self.tw,
+            self.tf > 0,
+        ])
 
 class SectionJ1(Section):
     shape_type = "j1"
@@ -555,9 +601,81 @@ class SectionL1(Section):
 
 class SectionL2(Section):
     shape_type = "l2"
-    parameter_names = VERTEX_FUNCTIONS["l2"][1]        
+    parameter_names = ["h", "tw", "ba", "ra"]  # VERTEX_FUNCTIONS["l2"][1]        
 
+    def is_valid(self):
+        return all([
+            self.h > self.tw + self.ra,
+            self.tw > 0,
+            self.ba > self.tw + self.ra,
+            self.ra > 0,
+        ])  
 
 class SectionZ3(Section):
     shape_type = "z3"
-    parameter_names = VERTEX_FUNCTIONS["z3"][1]    
+    parameter_names = ["h", "tw", "ba", "ra", "bf", "rf", "blf", "rlf"]  # VERTEX_FUNCTIONS["z3"][1]    
+
+    def is_valid(self):
+        return all([
+            self.h > 2*self.tw + self.ra + self.rf,
+            self.tw > 0,
+            self.ba > self.tw + self.ra,
+            self.ra > 0,
+            self.bf > 2*self.tw + self.rf + self.rlf,
+            self.rf > 0,
+            self.blf > self.tw + self.rlf,
+            self.blf < self.h,   # not strictly required 
+            self.rlf > 0,
+        ]) 
+
+
+class SectionZ5(Section):
+    shape_type = "z5"
+    parameter_names = ["h", "tw", "ba", "ta", "ra", "bf", "tf", "rf"]
+
+    def is_valid(self):
+        return all([
+            self.h > self.ta + self.ra + self.tf + self.rf,
+            self.tw > 0,
+            self.ba > self.tw + self.ra,
+            self.ra > 0,
+            self.ta > 0,
+            self.bf > self.tw + self.rf,
+            self.rf > 0,
+            self.tf > 0,
+        ]) 
+
+
+class SectionZ8(Section):
+    shape_type = "z8"
+    parameter_names = ["h", "tw", "ba", "ta", "ra", "rf"]
+
+    def is_valid(self):
+        return all([
+            self.h > self.ta + self.ra + self.tw + self.rf,
+            self.tw > 0,
+            self.ba > self.tw + self.ra,
+            self.ta > 0,
+            self.ra > 0,
+            self.rf > self.tw, # not strictly required
+        ]) 
+
+
+class SectionZ9(Section):
+    shape_type = "z9"
+    parameter_names = ["h", "tw", "ba", "ta", "ra", "bf", "tf", "rf", "blf", "tlf", "rlf"]
+
+    def is_valid(self):
+        return all([
+            self.h > self.ta + self.ra + self.tf + self.rf,
+            self.tw > 0,
+            self.ba > self.tw + self.ra,
+            self.ta > 0,
+            self.ra > 0,
+            self.bf > self.tw + self.rf + self.rlf + self.tlf,
+            self.tf > 0,
+            self.rf > 0,
+            self.blf > self.tf + self.rlf,
+            self.tlf > 0, 
+            self.rlf > 0,
+        ]) 
