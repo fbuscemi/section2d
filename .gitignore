@@ -6,3 +6,5 @@ dataset/*
 __pycache__/*
 models/*
 data/*
+dataset.zip
+history_Z9_flip_50.json
