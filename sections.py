@@ -446,10 +446,14 @@ def rotate_section(outer, inners, alpha, refpoint=(0,0)):
     pass
 
 
+# TODO: 
+# 1. General/abstract section object
+# 2. section from parameters
+# 3. section from explicitt coordinates
 
 class Section(object):
 
-    def __init__(self, *args):
+    def __init__(self, *args, origin=(0,0), phi=0, mirrored=False):
         """we should be able to initialise this in different ways:
         - list of parameters (order as in parameter names)
         - keyword arguments
@@ -484,6 +488,7 @@ class Section(object):
             p = p.union(Polygon(verts))
         for verts in self.inners:
             p = p.difference(Polygon(verts))
+        # FIXME: raie ValueError instead
         return p if p.is_valid else None
 
     def to_mesh(self):
@@ -498,7 +503,7 @@ class Section(object):
         return NotImplemented
 
     def to_image(self, figsize=300, pad=10):
-        """Return image as np.adarray (opencv etc."""
+        """Return image as np.adarray (opencv etc.)"""
         return image_cv2(self.outers, self.inners, figsize=figsize, pad=pad)
 
     def area(self):
